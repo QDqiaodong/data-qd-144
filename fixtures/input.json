@@ -1,0 +1,22 @@
+{
+  "stock_length": 10,
+  "kerf": 1,
+  "pieces": [
+    {
+      "id": "a",
+      "length": 6
+    },
+    {
+      "id": "b",
+      "length": 4
+    },
+    {
+      "id": "c",
+      "length": 3
+    },
+    {
+      "id": "d",
+      "length": 3
+    }
+  ]
+}
