@@ -30,6 +30,24 @@ stock-report --db warehouse.db --output run/stock_report.json
 - `stock-apply` 应用一个幂等批次；`start`/`finish` 是独占操作。
 - `stock-report` 读取单一 revision 并原子发布确定性 JSON。
 
+### 离线应付“收货凭证—供应商发票”对账与过账（独立采购数据，不读库存仓）
+
+```sh
+ap-check   --source fixtures/ap_source.json --ledger run/ap.db --output run/ap_check.json
+ap-post    --source fixtures/ap_source.json --ledger run/ap.db \
+           --proposal run/ap_check.json --request-id REQ-0001
+ap-reverse --ledger run/ap.db --posting-id 1 --request-id REQ-0002
+ap-report  --ledger run/ap.db --output run/ap_report.json
+```
+
+- `ap-check` 只读：账本不存在按空账读取且不建库；输出 infeasible/unique/ambiguous
+  及字典序最小的 1/2 个精确整数矩阵见证（行末单次银行家舍入，无浮点）。
+- 账本由首次成功的 `ap-post` 在单个立即事务内原子建立；proposal 绑定源字节
+  SHA-256 与 sequence；request-id 跨 post/reverse 全局幂等。
+- `ap-reverse` 追加相反分录并释放数量，旧证据冻结不删改；详见
+  [docs/ap_contract.md](docs/ap_contract.md) 与
+  [docs/ap_ledger_design.md](docs/ap_ledger_design.md)。
+
 ## 关键边界
 
 - 每库至多 12 根未消耗（可用或占用）棒，完工历史不计上限；

@@ -12,5 +12,9 @@ cutting-stock = "cutting_stock.cli:main"
 stock-init = "cutting_stock.stock_cli:main"
 stock-apply = "cutting_stock.stock_cli:main"
 stock-report = "cutting_stock.stock_cli:main"
+ap-check = "ap_ledger.cli:check_main"
+ap-post = "ap_ledger.cli:post_main"
+ap-reverse = "ap_ledger.cli:reverse_main"
+ap-report = "ap_ledger.cli:report_main"
 [tool.setuptools.packages.find]
 where = ["src"]

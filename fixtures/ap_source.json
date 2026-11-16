@@ -1,0 +1,63 @@
+{
+  "receipts": [
+    {
+      "id": "rcv-steel-001",
+      "supplier": "华东型材厂",
+      "po_line": "PO-2026-018#L1",
+      "sku": "FLAT-BAR-40x4",
+      "accepted_qty": 12,
+      "price_num": 3,
+      "price_den": 2
+    },
+    {
+      "id": "rcv-steel-002",
+      "supplier": "华东型材厂",
+      "po_line": "PO-2026-018#L1",
+      "sku": "FLAT-BAR-40x4",
+      "accepted_qty": 4,
+      "price_num": 7,
+      "price_den": 5
+    },
+    {
+      "id": "rcv-angle-007",
+      "supplier": "苏南角钢公司",
+      "po_line": "PO-2026-021#L2",
+      "sku": "ANGLE-50x5",
+      "accepted_qty": 6,
+      "price_num": 11,
+      "price_den": 10
+    }
+  ],
+  "invoices": [
+    {
+      "id": "INV-7701",
+      "supplier": "华东型材厂",
+      "lines": [
+        {
+          "id": "INV-7701/L1",
+          "po_line": "PO-2026-018#L1",
+          "sku": "FLAT-BAR-40x4",
+          "qty": 4,
+          "net_cents": 6,
+          "tax_bps": 1300,
+          "tax_cents": 1
+        }
+      ]
+    },
+    {
+      "id": "INV-7702",
+      "supplier": "苏南角钢公司",
+      "lines": [
+        {
+          "id": "INV-7702/L1",
+          "po_line": "PO-2026-021#L2",
+          "sku": "ANGLE-50x5",
+          "qty": 2,
+          "net_cents": 2,
+          "tax_bps": 0,
+          "tax_cents": 0
+        }
+      ]
+    }
+  ]
+}
