@@ -1,36 +1,57 @@
 # data-qd-144 · 定尺材料切割排样
 
-Deterministic first-fit-decreasing cutting plans and waste conservation。业务输入、计算和当前边界详见 [数据契约](docs/contract.md)。
+Deterministic offline cutting plans and waste conservation for a bounded,
+SQLite-backed material warehouse.
 
-## 安装与演示
+## 安装与运行
 
-Python >=3.11，运行和测试仅用标准库；先确认 `python3 --version`。
-每仓建立独立环境，构建工具锁版本。首次安装无公共缓存时可能联网；业务运行不访问网络。
+仅依赖 Python >=3.11 标准库与 SQLite：
 
 ```sh
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements-build.lock
-.venv/bin/python -m pip install --no-build-isolation --no-deps .
-.venv/bin/python -m pip check
-.venv/bin/cutting-stock --source fixtures/input.json --output run/report.json
-.venv/bin/python -m unittest discover -s tests -v
+python3 -m venv .venv && . .venv/bin/activate
+pip install -e .
 ```
 
-本地已有wheel时，安装构建工具可加 `--no-index --find-links <公共wheel缓存目录>`。
-修改源码后重新安装。本仓不共享其他仓环境，不依赖Docker、外部账号或持续服务。
+### 原有单次 FFD 契约（保持不变）
 
-输入JSON最多8MB，拒绝重复键、非有限数值和未定义字段；源字节SHA256随结果保留。
-输出是可独立读取的JSON；成功后原子替换，输入/计算失败退出2并保留旧报告。
-输入和输出不得相同，输出符号链接拒绝。单操作者批处理，不承诺并发发布或断电恢复。
-同输入重跑不累加。测试使用临时目录，运行产物在忽略的run/。
+```sh
+cutting-stock --source fixtures/input.json --output run/report.json
+```
 
-src/cutting_stock/model.py 为业务模型，相关算法模块独立组织；common.py 提供受限JSON及报告发布，
-cli.py 衔接数据链路。fixtures 为明确自制样例，代码与样例采用MIT许可。
+### 离线有限库存切割计划仓
 
-## 当前业务与样例
-# Bounded cutting plan v1
+```sh
+stock-init   --db warehouse.db --source fixtures/stock_init.json
+stock-apply  --db warehouse.db --request fixtures/stock_request.json
+stock-report --db warehouse.db --output run/stock_report.json
+```
 
-为材料计划者将显式零件切到同长度原料。stock_length为1..10^9整数长度，kerf为0..stock_length整数锯缝，pieces最多5000个唯一id及1..stock_length长度。每行恰一零件，不隐含数量展开。
-按长度降序、同长度id字典序，放入首个可容纳的现有棒，否则开启新棒。假定首零件无锯缝、每增加一个零件消耗一条kerf；没有首尾修边。每棒used=sum(piece_lengths)+kerf*(piece_count-1)，余料stock-used，所有零件恰一次且不超长。输出明确每棒零件及用量、全局零件/锯缝/余料守恒和忽略锯缝的ceil(total_piece_length/stock_length)下界。
-样例2棒：a6+c3+锯缝1恰10；b4+d3+锯缝1用8余2。该FFD启发式可行且确定，不保证最优棒数、切割次序机械可执行或最佳余料价值。无有限原棒库存、多材料、二维套料或真实设备控制。
+- `stock-init` 只建新库，保存输入副本（输入文件之后可删除/替换，不影响库）。
+- `stock-apply` 应用一个幂等批次；`start`/`finish` 是独占操作。
+- `stock-report` 读取单一 revision 并原子发布确定性 JSON。
 
+## 关键边界
+
+- 每库至多 12 根未消耗（可用或占用）棒，完工历史不计上限；
+- 每批至多 8 个开放工单、18 个待切零件；目标棒/工单在一批中至多出现一次；
+- `kerf` ∈ [0, 10^6] 整数，首件免锯缝，其后每件一次锯缝；
+- 长度 ∈ [1, 10^6]，棒/件等级 ∈ [0, 9]，棒材等级须不低于零件最低等级；
+- 规划器是**精确全局优化**（非 FFD），按合同五级字典序决策；
+- 只有 `finish` 提交的合格余料进入库存，计划余料绝不提前可用。
+
+## 测试
+
+```sh
+PYTHONPATH=src python3 -m unittest discover -s tests
+PYTHONPATH=src python3 tests/perf_stock_planner.py
+```
+
+- `test_business.py`：原 FFD 单次契约回归。
+- `test_stock_planner.py`：独立穷举逐项比对精确优化器（200+ 小实例）。
+- `test_stock_warehouse.py`：校验、幂等、revision、start/finish、余料结转、回滚、CLI 全链路。
+- `perf_stock_planner.py`：限定规模下可复现的耗时与内存记录。
+
+## 文档
+
+- [docs/contract.md](docs/contract.md)：原 FFD 数据契约。
+- [docs/stock_warehouse_design.md](docs/stock_warehouse_design.md)：精确搜索、剪枝、事务快照边界与资源记录。

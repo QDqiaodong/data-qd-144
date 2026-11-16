@@ -31,6 +31,19 @@ def read(path):
     data=json.loads(raw,object_pairs_hook=unique,parse_constant=invalid)
     return data,hashlib.sha256(raw).hexdigest()
 
+
+def strict_json_bytes(raw, max_size=8_000_000):
+    """Strict in-memory JSON: no duplicate keys, NaN/Infinity or booleans-as-ints surprises."""
+    if len(raw)>max_size:raise ValueError('JSON exceeds 8 MB')
+    def unique(pairs):
+        result={}
+        for k,v in pairs:
+            if k in result:raise ValueError('duplicate JSON key: '+k)
+            result[k]=v
+        return result
+    def invalid(v):raise ValueError('nonfinite JSON number: '+v)
+    return json.loads(raw,object_pairs_hook=unique,parse_constant=invalid)
+
 def save(path,report):
     dest=Path(path)
     if dest.is_symlink():raise ValueError('output cannot be a symlink')

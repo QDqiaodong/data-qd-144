@@ -1,0 +1,9 @@
+{
+  "kerf": 1,
+  "reuse_min": 4,
+  "bars": [
+    {"id": "bar-alpha", "length": 12, "grade": 0},
+    {"id": "bar-beta", "length": 12, "grade": 2},
+    {"id": "bar-gamma", "length": 9, "grade": 1}
+  ]
+}

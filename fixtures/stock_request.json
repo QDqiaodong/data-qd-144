@@ -1,0 +1,23 @@
+{
+  "batch_id": "batch-0001",
+  "expected_revision": 0,
+  "operations": [
+    {
+      "op": "order",
+      "id": "order-frame",
+      "priority": 80,
+      "pieces": [
+        {"id": "frame-rail-a", "length": 7, "min_grade": 1},
+        {"id": "frame-rail-b", "length": 4, "min_grade": 0}
+      ]
+    },
+    {
+      "op": "order",
+      "id": "order-brace",
+      "priority": 35,
+      "pieces": [
+        {"id": "brace-plate", "length": 5, "min_grade": 2}
+      ]
+    }
+  ]
+}

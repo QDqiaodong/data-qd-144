@@ -9,5 +9,8 @@ requires-python = ">=3.11"
 dependencies = []
 [project.scripts]
 cutting-stock = "cutting_stock.cli:main"
+stock-init = "cutting_stock.stock_cli:main"
+stock-apply = "cutting_stock.stock_cli:main"
+stock-report = "cutting_stock.stock_cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
