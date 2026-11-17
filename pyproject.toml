@@ -17,5 +17,9 @@ ap-post = "ap_ledger.cli:post_main"
 ap-reverse = "ap_ledger.cli:reverse_main"
 ap-report = "ap_ledger.cli:report_main"
 energy-audit = "energy_audit.cli:main"
+activity-init = "activity_ledger.cli:init_main"
+activity-apply = "activity_ledger.cli:apply_main"
+activity-close = "activity_ledger.cli:close_main"
+activity-report = "activity_ledger.cli:report_main"
 [tool.setuptools.packages.find]
 where = ["src"]

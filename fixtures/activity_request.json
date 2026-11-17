@@ -1,0 +1,19 @@
+{
+  "request_id": "ACT-0001",
+  "expected_generation": 0,
+  "events": [
+    {"event_id": "evt-t9", "revision": 1, "op": "put",
+     "account_id": "acct-B", "event_time": 9, "amount_minor": 100},
+    {"event_id": "evt-t10", "revision": 1, "op": "put",
+     "account_id": "acct-B", "event_time": 10, "amount_minor": 200},
+    {"event_id": "evt-t29", "revision": 1, "op": "put",
+     "account_id": "acct-B", "event_time": 29, "amount_minor": 300},
+    {"event_id": "evt-t30", "revision": 1, "op": "put",
+     "account_id": "acct-B", "event_time": 30, "amount_minor": 400}
+  ],
+  "links": [
+    {"link_id": "lnk-ab", "revision": 1, "op": "put",
+     "left_account": "acct-A", "right_account": "acct-B",
+     "valid_from": 10, "valid_to": 30}
+  ]
+}

@@ -64,6 +64,26 @@ energy-audit --warehouse warehouse.db --source fixtures/energy_source.json \
 - 详见 [docs/energy_contract.md](docs/energy_contract.md) 与
   [docs/energy_audit_design.md](docs/energy_audit_design.md)。
 
+### 离线客户活动账本：可审计身份归并与历史重述（独立 SQLite 库）
+
+```sh
+activity-init   --db activity.db
+activity-apply  --db activity.db --request fixtures/activity_request.json
+activity-close  --db activity.db --request fixtures/activity_close.json
+activity-report --db activity.db --close-id CLOSE-0001 --output run/activity.json
+```
+
+- 客户账号可能属于同一客户；关系修订按知识时间（generation）可追溯生效，
+  使同一报告期的交易重新归属。`link` 是有效时间 `[valid_from,valid_to)` 上
+  的无向等价断言，按每笔交易的 `event_time` 构图传递归并。
+- `activity-close` 在关账 generation 冻结 `as_booked`（每 canonical account
+  的 `event_ids`、笔数、金额），此后任何事件/关系修订都不能改写其字节；
+  `activity-report` 另给出按当前 generation 重述的 `restated` 与逐账号差异
+  （旧组撤减 + 新组增量），并标注各自 generation。
+- apply 严格批次、连续 revision、幂等回执与 `generation` 恰 +1 单事务提交；
+  详见 [docs/activity_contract.md](docs/activity_contract.md) 与
+  [docs/activity_design.md](docs/activity_design.md)。
+
 ## 关键边界
 
 - 每库至多 12 根未消耗（可用或占用）棒，完工历史不计上限；
@@ -85,6 +105,8 @@ PYTHONPATH=src python3 tests/perf_stock_planner.py
 - `test_stock_warehouse.py`：校验、幂等、revision、start/finish、余料结转、回滚、CLI 全链路。
 - `test_energy_audit.py`：归因/计量/预算联动验收、独立枚举 oracle 比对、
   极值见证复算、守恒恒等式、并发快照与 CLI 失败路径。
+- `test_activity_ledger.py`：严格校验、有效/知识时间身份解析、图拆分与合并、
+  关账冻结与重述差异、幂等/并发/回滚、独立 BFS oracle 与 CLI 全链路。
 - `perf_stock_planner.py`：限定规模下可复现的耗时与内存记录。
 
 ## 文档
@@ -93,3 +115,7 @@ PYTHONPATH=src python3 tests/perf_stock_planner.py
 - [docs/stock_warehouse_design.md](docs/stock_warehouse_design.md)：精确搜索、剪枝、事务快照边界与资源记录。
 - [docs/energy_contract.md](docs/energy_contract.md)：用电归因与计量不确定性数据契约。
 - [docs/energy_audit_design.md](docs/energy_audit_design.md)：联合枚举、精确有理数与快照取舍。
+- [docs/activity_contract.md](docs/activity_contract.md)：客户活动账本数据契约
+  （apply/close/report、双时态身份与失败码）。
+- [docs/activity_design.md](docs/activity_design.md)：修订选择、逐时刻构图、
+  关账冻结与重述差异的设计取舍。
