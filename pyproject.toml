@@ -16,5 +16,6 @@ ap-check = "ap_ledger.cli:check_main"
 ap-post = "ap_ledger.cli:post_main"
 ap-reverse = "ap_ledger.cli:reverse_main"
 ap-report = "ap_ledger.cli:report_main"
+energy-audit = "energy_audit.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]

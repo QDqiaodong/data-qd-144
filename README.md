@@ -48,6 +48,22 @@ ap-report  --ledger run/ap.db --output run/ap_report.json
   [docs/ap_contract.md](docs/ap_contract.md) 与
   [docs/ap_ledger_design.md](docs/ap_ledger_design.md)。
 
+### 离线完工工单用电归因与计量不确定性核算（只读仓库）
+
+```sh
+energy-audit --warehouse warehouse.db --source fixtures/energy_source.json \
+             --output run/energy_report.json
+```
+
+- 严格只读：`mode=ro` 单事务快照读取 revision 与 `plan_history` 完工布局，
+  不建库、不改 schema、不写业务表；并发 finish 不会撕裂快照。
+- 回绕电表读数 → 每区间至多 3 个候选真实用电；一套解释是完整 d 向量，
+  仅在全部工单预算合取下可行；枚举完整联合可行集合（不做边际拼接），
+  输出解释计数与逐工单/逐表 idle/全表合计的精确分数范围及字典序最小
+  见证向量；报告无浮点数。
+- 详见 [docs/energy_contract.md](docs/energy_contract.md) 与
+  [docs/energy_audit_design.md](docs/energy_audit_design.md)。
+
 ## 关键边界
 
 - 每库至多 12 根未消耗（可用或占用）棒，完工历史不计上限；
@@ -67,9 +83,13 @@ PYTHONPATH=src python3 tests/perf_stock_planner.py
 - `test_business.py`：原 FFD 单次契约回归。
 - `test_stock_planner.py`：独立穷举逐项比对精确优化器（200+ 小实例）。
 - `test_stock_warehouse.py`：校验、幂等、revision、start/finish、余料结转、回滚、CLI 全链路。
+- `test_energy_audit.py`：归因/计量/预算联动验收、独立枚举 oracle 比对、
+  极值见证复算、守恒恒等式、并发快照与 CLI 失败路径。
 - `perf_stock_planner.py`：限定规模下可复现的耗时与内存记录。
 
 ## 文档
 
 - [docs/contract.md](docs/contract.md)：原 FFD 数据契约。
 - [docs/stock_warehouse_design.md](docs/stock_warehouse_design.md)：精确搜索、剪枝、事务快照边界与资源记录。
+- [docs/energy_contract.md](docs/energy_contract.md)：用电归因与计量不确定性数据契约。
+- [docs/energy_audit_design.md](docs/energy_audit_design.md)：联合枚举、精确有理数与快照取舍。

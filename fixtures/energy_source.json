@@ -1,0 +1,31 @@
+{
+  "meters": [
+    {
+      "id": "meter-main",
+      "modulus": 100,
+      "max_power": 1,
+      "readings": [
+        {"t": 0, "value": 10},
+        {"t": 6, "value": 16},
+        {"t": 10, "value": 20}
+      ]
+    }
+  ],
+  "runs": [
+    {
+      "id": "run-1",
+      "meter_id": "meter-main",
+      "plan_id": "plan-r1-1",
+      "bar_id": "bar-alpha",
+      "start": 2,
+      "end": 8
+    }
+  ],
+  "tariffs": [
+    {"meter_id": "meter-main", "start": 0, "end": 5, "price_num": 2, "price_den": 1},
+    {"meter_id": "meter-main", "start": 5, "end": 10, "price_num": 3, "price_den": 1}
+  ],
+  "budgets": [
+    {"work_order": "wo-frame", "min_energy": 0, "max_energy": 1000000000000}
+  ]
+}
